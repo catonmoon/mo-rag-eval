@@ -1,6 +1,6 @@
 # MO Rag Evaluation — оценка RAG через LLM-as-a-Judge
 
-Развёртывание на сервере — **[DEPLOY.md](DEPLOY.md)**.
+Как пользоваться — **[USAGE.md](USAGE.md)**. Развёртывание на сервере — **[DEPLOY.md](DEPLOY.md)**.
 
 ## Что это
 
