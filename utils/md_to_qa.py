@@ -27,7 +27,7 @@ from openai import OpenAI, RateLimitError, APIConnectionError, APITimeoutError, 
 # ──────────────────────────────────────────────
 # Настройки
 # ──────────────────────────────────────────────
-GROK_MODEL         = "grok-4-1-fast-reasoning"
+GROK_MODEL         = "grok-4-1-fast-non-reasoning"
 CHARS_PER_QUESTION  = 1000  # ~1 вопрос на 1000 символов
 MIN_QUESTIONS_TOTAL = 1     # минимум вопросов на документ
 MAX_QUESTIONS_CHUNK = 50    # максимум вопросов за один запрос (один чанк)

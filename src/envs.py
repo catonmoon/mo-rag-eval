@@ -1,14 +1,33 @@
 import os
 import json
 
-# ── xAI / Grok ───────────────────────────────────────────────────────────────
-XAI_API_KEY = os.getenv("XAI_API_KEY", "")
-EVAL_MODEL = os.getenv("EVAL_MODEL", "grok-4-1-fast-reasoning")
+# ── Auth ─────────────────────────────────────────────────────────────────────
+# Пароли для входа на страницу (csv) — задаются через env EDIT_PASSWORDS.
+# Дефолт "pass" — заглушка: ОБЯЗАТЕЛЬНО СМЕНИТЬ (задать EDIT_PASSWORDS в окружении).
+EDIT_PASSWORDS = {
+    p.strip()
+    for p in os.getenv("EDIT_PASSWORDS", "pass").split(",")
+    if p.strip()
+}
+
+# ── Primary judge: deepseek-v4-flash через OpenRouter (с 17.06.26, ушли с Grok/xAI) ──
+XAI_API_KEY = os.getenv("XAI_API_KEY", "")  # legacy
+EVAL_MODEL = os.getenv("EVAL_MODEL", "deepseek/deepseek-v4-flash")
 EVAL_CONCURRENCY = int(os.getenv("EVAL_CONCURRENCY", "5"))
 PROXY_URL = os.getenv("PROXY_URL", "")
 
 # ── Пути к данным ─────────────────────────────────────────────────────────────
 QUESTIONS_PATH = os.getenv("QUESTIONS_PATH", "data/questions/questions_public.jsonl")
+
+# Папка с gold-файлами и архивом версий.
+# Внутри:
+#   answers_gold.jsonl         — active (может быть в режиме черновика)
+#   answers_gold_old.jsonl     — присутствует только пока active=draft
+#   versions/                  — архив зафиксированных версий + diffs
+GOLD_DIR = os.getenv("GOLD_DIR", "data/gold")
+GOLD_ACTIVE_FILE = "answers_gold.jsonl"
+GOLD_OLD_FILE = "answers_gold_old.jsonl"
+GOLD_VERSIONS_SUBDIR = "versions"
 
 # Эталонные ответы — параметры загрузки
 _HF_TOKEN = os.getenv("HF_TOKEN", "")
@@ -50,3 +69,8 @@ def get_gold_path() -> str:
 def load_jsonl(path: str) -> list[dict]:
     with open(path, encoding="utf-8") as f:
         return [json.loads(line) for line in f if line.strip()]
+
+# ── OpenRouter / Secondary judge ──────────────────────────────────────────────
+OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY', '')
+SECONDARY_MODEL = os.getenv('SECONDARY_MODEL', '')
+JUDGE_CACHE_PATH = os.getenv('JUDGE_CACHE_PATH', 'data/judge_cache.json')
