@@ -1,4 +1,4 @@
-# src/submission/submit.py  — dual LLM-as-judge: Grok (primary) + Qwen via OpenRouter (secondary)
+# src/submission/submit.py  — dual LLM-as-judge через OpenRouter: primary (EVAL_MODEL) + опциональный secondary
 # Judgments are cached by (qid, pred_hash) in data/judge_cache.json
 import json
 import re
@@ -23,7 +23,8 @@ from src.envs import (
 from src.gold_versioning import gold_path_for_version
 
 SECONDARY_ENABLED = bool(SECONDARY_MODEL and OPENROUTER_API_KEY)
-DEFAULT_SECONDARY_MODEL = "qwen/qwen3.5-flash-02-23"  # используется если юзер в UI включил secondary, но SECONDARY_MODEL env пуст
+DEFAULT_SECONDARY_MODEL = "minimax/minimax-m3.1-flash"  # используется если юзер в UI включил secondary, но SECONDARY_MODEL env пуст (до 28.10.26 — qwen/qwen3.5-flash-02-23)
+SECONDARY_MODEL_EFFECTIVE = SECONDARY_MODEL or DEFAULT_SECONDARY_MODEL
 
 
 # ── Метрика «ссылка попала в gold» ───────────────────────────────────────────
@@ -89,7 +90,7 @@ def _save_cache():
 
 # Bump при изменении SYSTEM_PROMPT — это инвалидирует кэш судьи (старые записи
 # в judge_cache.json остаются, но не используются: новые ключи имеют новую версию).
-_PROMPT_VERSION = "v3"
+_PROMPT_VERSION = "v4"  # v4: смена судьи на deepseek-v4.1-flash (28.10.26)
 
 
 def _cache_key(qid: str, pred: str, gold: str) -> str:
@@ -117,7 +118,7 @@ def _get_primary():
             proxy=PROXY_URL if PROXY_URL else None,
             timeout=httpx.Timeout(3600.0),
         )
-        # Primary judge переведён с Grok (xAI) на deepseek-v4-flash через OpenRouter (17.06.26)
+        # Primary judge через OpenRouter (модель — EVAL_MODEL; с 28.10.26 deepseek-v4.1-flash)
         _client_primary = OpenAI(
             api_key=OPENROUTER_API_KEY,
             base_url="https://openrouter.ai/api/v1",
@@ -243,6 +244,11 @@ def _judge(
             return score, elapsed
         except Exception as e:
             msg = str(e)
+            # Некоторые модели (напр. minimax-m3.1-flash) не дают выключить reasoning —
+            # тогда повторяем тот же запрос с reasoning.
+            if disable_reasoning and "reasoning is mandatory" in msg.lower():
+                print(f"[judge:{model}] reasoning is mandatory, retry with reasoning")
+                return _judge(client, model, question, gold, pred, disable_reasoning=False)
             # Если ошибка про response_format / json_schema — пробуем fallback.
             if response_format is _JUDGE_SCHEMA and any(
                 kw in msg.lower() for kw in ("response_format", "json_schema", "schema", "structured")

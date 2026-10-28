@@ -56,10 +56,10 @@ Gradio-приложение (один процесс `app.py`), без БД — 
 
 | Что поменять | Где |
 |---|---|
-| Модель основного судьи | env `EVAL_MODEL` (сейчас `deepseek/deepseek-v4-flash`, через OpenRouter). Дефолт — `src/envs.py` |
-| Модель второго судьи | env `SECONDARY_MODEL`; если пусто, при галке в UI берётся `DEFAULT_SECONDARY_MODEL = "qwen/qwen3.5-flash-02-23"` в `submit.py` |
+| Модель основного судьи | env `EVAL_MODEL` (сейчас `deepseek/deepseek-v4.1-flash`, через OpenRouter). Дефолт — `src/envs.py` |
+| Модель второго судьи | env `SECONDARY_MODEL`; если пусто, при галке в UI берётся `DEFAULT_SECONDARY_MODEL = "minimax/minimax-m3.1-flash"` в `submit.py`. Если модель не даёт выключить reasoning — код сам повторит запрос с ним |
 | Промпт судьи | `SYSTEM_PROMPT` и `USER_PROMPT_TEMPLATE` в `submit.py` |
-| Сбросить кэш после смены промпта | **поднять `_PROMPT_VERSION`** (сейчас `"v3"`) в `submit.py`. Иначе старые вердикты из кэша будут переиспользованы |
+| Сбросить кэш после смены промпта | **поднять `_PROMPT_VERSION`** (сейчас `"v4"`) в `submit.py`. Иначе старые вердикты из кэша будут переиспользованы |
 | Параллельность | env `EVAL_CONCURRENCY` (по умолчанию 5) |
 | Ключ API | env `OPENROUTER_API_KEY` (оба судьи ходят через OpenRouter). `XAI_API_KEY` — наследие, не используется |
 | Прокси до OpenRouter | env `PROXY_URL` (сейчас не задан) |
@@ -104,7 +104,7 @@ journalctl -u <service> -f   # [judge:...] ошибки, [eval] cached/new
 
 ```bash
 python3 -m venv venv && venv/bin/pip install -r requirements.lock.txt
-export OPENROUTER_API_KEY=... EVAL_MODEL=deepseek/deepseek-v4-flash EDIT_PASSWORDS=...
+export OPENROUTER_API_KEY=... EVAL_MODEL=deepseek/deepseek-v4.1-flash EDIT_PASSWORDS=...
 export GOLD_PATH_LOCAL=$PWD/data/gold/answers_gold.jsonl SHOW_DETAILS=1
 venv/bin/python app.py      # http://localhost:7862
 ```

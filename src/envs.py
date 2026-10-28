@@ -10,9 +10,9 @@ EDIT_PASSWORDS = {
     if p.strip()
 }
 
-# ── Primary judge: deepseek-v4-flash через OpenRouter (с 17.06.26, ушли с Grok/xAI) ──
+# ── Primary judge через OpenRouter: deepseek-v4.1-flash (с 28.10.26; до того v4-flash с 17.06.26, ещё раньше Grok/xAI) ──
 XAI_API_KEY = os.getenv("XAI_API_KEY", "")  # legacy
-EVAL_MODEL = os.getenv("EVAL_MODEL", "deepseek/deepseek-v4-flash")
+EVAL_MODEL = os.getenv("EVAL_MODEL", "deepseek/deepseek-v4.1-flash")
 EVAL_CONCURRENCY = int(os.getenv("EVAL_CONCURRENCY", "5"))
 PROXY_URL = os.getenv("PROXY_URL", "")
 

@@ -48,8 +48,8 @@ data/human_overrides.json         # ручные вердикты (можно н
 |---|---|---|
 | `OPENROUTER_API_KEY` | да | ключ OpenRouter |
 | `EDIT_PASSWORDS` | **да** | пароль(и) входа через запятую. В коде заглушка `pass` — **сменить** |
-| `EVAL_MODEL` | нет | модель судьи, по умолчанию `deepseek/deepseek-v4-flash` |
-| `SECONDARY_MODEL` | нет | второй судья; пусто → `qwen/qwen3.5-flash-02-23` при включённой галке в UI |
+| `EVAL_MODEL` | нет | модель судьи, по умолчанию `deepseek/deepseek-v4.1-flash` |
+| `SECONDARY_MODEL` | нет | второй судья; по умолчанию `minimax/minimax-m3.1-flash` (используется, только если в UI включена галка Secondary) |
 | `EVAL_CONCURRENCY` | нет | параллельных запросов к судье, по умолчанию 5 |
 | `PROXY_URL` | нет | прокси до OpenRouter (`http://...` или `socks5://...`) |
 | `GOLD_PATH_LOCAL` | нет | путь к активному эталону (по умолчанию `data/gold/answers_gold.jsonl`) |
@@ -80,7 +80,8 @@ WorkingDirectory=/opt/mo-rag-eval
 ExecStart=/opt/mo-rag-eval/venv/bin/python app.py
 Environment=OPENROUTER_API_KEY=sk-or-...
 Environment=EDIT_PASSWORDS=новый_пароль
-Environment=EVAL_MODEL=deepseek/deepseek-v4-flash
+Environment=EVAL_MODEL=deepseek/deepseek-v4.1-flash
+Environment=SECONDARY_MODEL=minimax/minimax-m3.1-flash
 Environment=SHOW_DETAILS=1
 Restart=always
 RestartSec=5

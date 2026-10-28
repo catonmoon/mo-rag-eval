@@ -11,8 +11,12 @@ from pathlib import Path
 from markdown_it import MarkdownIt
 
 from src.submission.check_validity import check_submission
-from src.submission.submit import evaluate_submission, get_progress
-from src.envs import load_jsonl, QUESTIONS_PATH, EVAL_CONCURRENCY, EDIT_PASSWORDS
+from src.submission.submit import evaluate_submission, get_progress, SECONDARY_MODEL_EFFECTIVE
+from src.envs import load_jsonl, QUESTIONS_PATH, EVAL_CONCURRENCY, EDIT_PASSWORDS, EVAL_MODEL
+
+# Короткие имена судей для UI
+JUDGE1 = EVAL_MODEL.split("/")[-1]
+JUDGE2 = SECONDARY_MODEL_EFFECTIVE.split("/")[-1]
 from src import gold_versioning as gv
 
 # gfm-like — поддержка таблиц + strikethrough. html: False — raw HTML в ответах режется.
@@ -401,7 +405,7 @@ def submit_file(file_obj, use_secondary: bool, gold_version: str):
     )
     t.start()
 
-    mode = "DeepSeek + Qwen (dual)" if use_secondary else "DeepSeek only"
+    mode = f"{JUDGE1} + {JUDGE2} (dual)" if use_secondary else f"{JUDGE1} only"
     msg = f"⏳ Evaluating **{filename}** ({mode}) on gold `{gold_version}`... watch the progress bar below."
     return msg, load_sorted_leaderboard(), gr.update(choices=list_submissions()), gr.update(visible=True, value="⏳ Progress: 0 / ?")
 
@@ -445,7 +449,7 @@ def poll_progress() -> gr.update:
         eta_str = f"{int(eta_sec)}s"
     return gr.update(
         visible=True,
-        value=f"⏳ `{bar}` {done}/{total} ({pct}%) — {remaining} left ~{eta_str} | DeepSeek: {avg_p}/q | Qwen: {avg_s}/q | cache: {cached}"
+        value=f"⏳ `{bar}` {done}/{total} ({pct}%) — {remaining} left ~{eta_str} | {JUDGE1}: {avg_p}/q | {JUDGE2}: {avg_s}/q | cache: {cached}"
     )
 
 
@@ -491,7 +495,7 @@ def _render_qid_card_html(d: dict, css_class: str) -> str:
     pred = _md_to_html(d.get("pred", ""))
     sp = d.get("score_primary", "?")
     ss = d.get("score_secondary", "?")
-    verdict_line = f"<b>DeepSeek:</b> {sp} &nbsp;|&nbsp; <b>Qwen:</b> {ss}"
+    verdict_line = f"<b>Судья 1:</b> {sp} &nbsp;|&nbsp; <b>Судья 2:</b> {ss}"
     if d.get("sources"):
         lo = d.get("links_ok")
         if lo is not None:
@@ -801,7 +805,7 @@ def build_ui():
             gr.Markdown(
                 "# 🏁 MO Rag Evaluation — LLM-as-a-Judge\n"
                 "Загрузи ответы своей RAG-системы в JSONL. "
-                "Каждый ответ судит **deepseek-v4-flash** (опционально + Qwen) против gold."
+                f"Каждый ответ судит **{JUDGE1}** (опционально + **{JUDGE2}**) против gold."
             )
 
             # ── Leaderboard ─────────────────────────────────────────────────
@@ -841,7 +845,7 @@ def build_ui():
                 )
                 use_secondary_in = gr.Checkbox(
                     value=False,
-                    label="Secondary judge (qwen3.5-flash-02-23) — dual-judge с ToCheck",
+                    label=f"Secondary judge ({JUDGE2}) — dual-judge с ToCheck",
                 )
             file_in = gr.File(label="Upload JSONL (answers)", file_types=[".jsonl"])
             submit_btn = gr.Button("Submit", variant="primary")
@@ -857,8 +861,8 @@ def build_ui():
             # ── Dataset info ────────────────────────────────────────────────
             gr.Markdown(
                 "## 📋 Dataset info\n"
-                "- **Primary judge:** `deepseek-v4-flash` (DeepSeek via OpenRouter, thinking)\n"
-                "- **Secondary judge:** Qwen `qwen/qwen3.5-flash-02-23` (OpenRouter, опционально)\n"
+                f"- **Primary judge:** `{JUDGE1}` (OpenRouter)\n"
+                f"- **Secondary judge:** `{JUDGE2}` (OpenRouter, опционально)\n"
                 "- **Scoring:** оба согласны → ✅ Correct/❌ Wrong; разошлись → 🟡 ToCheck (исключается из accuracy)\n"
                 "- **Accuracy** = Correct / (n_submit − ToCheck)\n"
                 "- Gold answers: stored privately on server\n"
