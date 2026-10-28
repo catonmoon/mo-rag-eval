@@ -1,4 +1,6 @@
-# MORAG Arena — RAG Leaderboard (LLM-as-a-Judge)
+# MO Rag Evaluation — оценка RAG через LLM-as-a-Judge
+
+Развёртывание на сервере — **[DEPLOY.md](DEPLOY.md)**.
 
 ## Что это
 
@@ -98,7 +100,7 @@ journalctl -u <service> -f   # [judge:...] ошибки, [eval] cached/new
 ## Пароль на вход
 `EDIT_PASSWORDS` (через запятую) в env. В коде стоит заглушка **`pass`** — **обязательно смените**, задав `EDIT_PASSWORDS`.
 
-## Запуск с нуля
+## Быстрый локальный запуск
 
 ```bash
 python3 -m venv venv && venv/bin/pip install -r requirements.lock.txt

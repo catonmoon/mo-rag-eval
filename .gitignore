@@ -6,3 +6,10 @@ data/gold/
 data/documents.zip
 leaderboard.csv
 eval_details.jsonl
+data/human_overrides.json
+data/judge_cache.json
+data/*.xlsx
+backups/
+venv/
+__pycache__/
+*.bak*

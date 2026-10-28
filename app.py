@@ -1,4 +1,4 @@
-# app.py — RAG Arena (MO) — LLM-as-a-Judge с правкой gold и версионностью
+# app.py — MO Rag Evaluation — LLM-as-a-Judge с правкой gold и версионностью
 import os
 import json
 import html
@@ -781,7 +781,7 @@ def build_ui():
     ensure_leaderboard()
     _sync_questions_from_active_gold()
 
-    with gr.Blocks(title="MORAG Arena") as demo:
+    with gr.Blocks(title="MO Rag Evaluation") as demo:
 
         # ── 0. Pwd-gate ───────────────────────────────────────────────────────
         with gr.Column(visible=True) as gate:
@@ -789,7 +789,7 @@ def build_ui():
                 gr.Markdown("&nbsp;")
             with gr.Row():
                 gr.Markdown("&nbsp;")
-            gr.Markdown("# 🔒 MORAG Arena", elem_id="gate_title")
+            gr.Markdown("# 🔒 MO Rag Evaluation", elem_id="gate_title")
             gr.Markdown("Введите пароль для входа.")
             pwd_in = gr.Textbox(label="Пароль", type="password", autofocus=True)
             login_btn = gr.Button("Войти", variant="primary")
@@ -799,7 +799,7 @@ def build_ui():
         with gr.Column(visible=False) as main:
             gr.HTML(_CARD_CSS)
             gr.Markdown(
-                "# 🏁 RAG Arena (MO) — LLM-as-a-Judge\n"
+                "# 🏁 MO Rag Evaluation — LLM-as-a-Judge\n"
                 "Загрузи ответы своей RAG-системы в JSONL. "
                 "Каждый ответ судит **deepseek-v4-flash** (опционально + Qwen) против gold."
             )

@@ -6,11 +6,11 @@ ENV PATH="/home/user/.local/bin:$PATH"
 
 WORKDIR /app
 
-COPY --chown=user requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY --chown=user requirements.lock.txt .
+RUN pip install --no-cache-dir -r requirements.lock.txt
 
 COPY --chown=user . .
 
-EXPOSE 7860
+EXPOSE 7862
 
 CMD ["python", "app.py"]
